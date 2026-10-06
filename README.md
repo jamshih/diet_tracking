@@ -2,6 +2,8 @@
 
 A free, open-source personal food journal for discovering which foods or food combinations are **associated** with stomach discomfort.
 
+> **Current contributor notice:** GitHub Actions runtime is exhausted. Required validation is performed on the maintainer's local Mac. Agents must record exact local test commands/results, or mark work `pending local Mac verification`. Use standard `grep` for repository text search rather than `rg`/`ag`/other alternatives.
+
 The app’s core loop is:
 
 1. log what you eat for each meal;
@@ -78,7 +80,7 @@ Advertising must be isolated from health inference. Diet logs, symptom episodes,
 
 ## Current milestone
 
-Gate S3: one headless command must prove **log -> persist -> reload -> analyze -> expected report**.
+Gate S3: one headless command on the local Mac must prove **log -> persist -> reload -> analyze -> expected report**.
 
 ## Open source
 
