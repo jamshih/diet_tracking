@@ -84,8 +84,13 @@ Do not commit machine-specific signing team IDs, absolute local paths, credentia
 
 ## Validation status for the bootstrap PR
 
-The implementation agent that created Issue #25 did not run on the maintainer's local Mac.
+Maintainer local-Mac validation is complete and passing.
 
-**pending local Mac verification**
+Confirmed results:
 
-Run the commands above on the maintainer's Mac and record their actual output/result on the PR before merge.
+- SwiftPM/XCTest: **1 test, 0 failures**.
+- Native iOS `xcodebuild`: **BUILD SUCCEEDED**.
+- Core SwiftUI grep: **no matches**.
+- SwiftUI imports are confined to the app layer.
+
+The exact validation commands above were executed on the maintainer's local Mac and their actual results are recorded on PR #27.
