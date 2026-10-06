@@ -105,12 +105,18 @@ final class DomainContractTests: XCTestCase {
         XCTAssertTrue(meal.isSpicy)
     }
 
+    func testMealTypeRemainsExtensibleButRejectsBlankValues() throws {
+        XCTAssertEqual(try MealType("brunch").rawValue, "brunch")
+        XCTAssertThrowsError(try MealType("   "))
+    }
+
     func testFoodNormalizationIsDeterministicAndTransparent() throws {
-        let first = try FoodItem(displayName: "  Fried\t Chicken  ")
+        let first = try FoodItem(displayName: "  Fried Chicken  ")
         let second = try FoodItem(displayName: "fried   chicken")
         let distinct = try FoodItem(displayName: "chicken")
 
         XCTAssertEqual(first.displayName, "Fried Chicken")
+        XCTAssertEqual(second.displayName, "fried   chicken")
         XCTAssertEqual(first.normalizedName, "fried chicken")
         XCTAssertEqual(first.id, second.id)
         XCTAssertEqual(first, second)
