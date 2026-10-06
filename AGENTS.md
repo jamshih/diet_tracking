@@ -2,6 +2,33 @@
 
 This repository is designed for multiple coding/review agents working asynchronously.
 
+## Current execution constraint — local Mac validation only
+
+**GitHub Actions runtime is currently exhausted. Do not rely on GitHub Actions as a validation gate.**
+
+Until this notice is explicitly removed:
+
+- required tests must pass on the maintainer's local Mac;
+- do not treat a missing, skipped, queued, or infrastructure-failed GitHub Actions run as evidence that code passed;
+- if you have access to the local Mac environment, run the required validation there;
+- if you do **not** have access to the local Mac, hand off the exact commands that must be run locally and mark validation as **pending local Mac verification**;
+- never write "tests passed" unless the relevant commands actually completed successfully on the local Mac or their result was provided back to you;
+- PRs and handoffs must record the exact commands and result/output summary.
+
+### Repository search tooling
+
+For repository text searches, use standard `grep`.
+
+Examples:
+
+```sh
+grep -R "CandidateSignal" .
+grep -R -n "SymptomEpisode" .
+grep -R -n --exclude-dir=.git "TODO" .
+```
+
+Do not assume or require `rg`, `ag`, `ack`, or another search tool. Use `grep` for text search so commands are reproducible on the maintainer's Mac.
+
 ## Prime directive
 
 Do not optimize presentation or monetization before semantic correctness.
@@ -79,11 +106,11 @@ Every implementation PR must include:
 - responsibility/team;
 - semantic behavior changed;
 - tests/fixtures added;
-- validation command(s);
+- exact local-Mac validation command(s), or an explicit pending-local-validation handoff;
 - known limitations;
 - concise handoff.
 
-Do not merge a behavior change that lacks regression coverage.
+Do not merge a behavior change that lacks regression coverage and required local-Mac validation evidence.
 
 ## Handoff rule
 
@@ -91,7 +118,7 @@ Before stopping work, update the issue or PR with:
 
 - **State:** done / partial / blocked;
 - **Changed:** files/modules and behavior;
-- **Validated:** exact commands/tests and result;
+- **Validated:** exact local-Mac commands/tests and result, or `pending local Mac verification`;
 - **Remaining:** smallest next tasks;
 - **Risks:** assumptions, edge cases, disagreements;
 - **Next agent:** which team should pick it up.
