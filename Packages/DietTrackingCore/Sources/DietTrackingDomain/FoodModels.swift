@@ -2,17 +2,20 @@ import Foundation
 
 /// Transparent normalization defined by RFC #3's current contract.
 public enum FoodNormalizer {
-    /// Trims surrounding whitespace, collapses repeated whitespace, and preserves
-    /// the user's casing/spelling for display.
+    /// Trims only surrounding whitespace for presentation. Internal spelling,
+    /// casing, and spacing remain user-facing rather than being rewritten.
     public static func displayText(from input: String) -> String {
-        input.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
+        input.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// Produces the stable identity key from transparent whitespace normalization
-    /// plus deterministic case folding. No fuzzy, AI, alias, stemming, or category
+    /// Produces the stable identity key by trimming/collapsing whitespace and
+    /// deterministic case folding. No fuzzy, AI, alias, stemming, or category
     /// merge is performed.
     public static func identityKey(from input: String) -> String {
-        displayText(from: input).lowercased()
+        input
+            .split(whereSeparator: { $0.isWhitespace })
+            .joined(separator: " ")
+            .lowercased()
     }
 }
 
@@ -58,13 +61,31 @@ extension FoodItem: Hashable {
     }
 }
 
-/// Product-level meal category required by the current product contract.
-public enum MealType: String, CaseIterable, Hashable, Sendable {
-    case breakfast
-    case lunch
-    case dinner
-    case snack
-    case other
+/// Product-level meal category.
+///
+/// The product requires a meal type but does not yet fix a closed taxonomy. The
+/// standard values are conveniences, while the validated value type remains
+/// extensible without a domain-schema migration.
+public struct MealType: Hashable, Sendable {
+    public let rawValue: String
+
+    public init(_ rawValue: String) throws {
+        let value = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !value.isEmpty else {
+            throw DomainValidationError.emptyMealType
+        }
+        self.rawValue = value
+    }
+
+    private init(knownValue: String) {
+        self.rawValue = knownValue
+    }
+
+    public static let breakfast = MealType(knownValue: "breakfast")
+    public static let lunch = MealType(knownValue: "lunch")
+    public static let dinner = MealType(knownValue: "dinner")
+    public static let snack = MealType(knownValue: "snack")
+    public static let other = MealType(knownValue: "other")
 }
 
 public struct MealLog: Hashable, Sendable {
