@@ -102,3 +102,17 @@ First bootstrap the native Swift project/module skeleton. Then Gate S3 must even
 ## Open source
 
 This project is intended to remain free and open source. The exact license will be selected through an explicit RFC rather than silently assumed.
+
+## Native iOS bootstrap
+
+The implementation skeleton lives in `DietTracking.xcodeproj` and `Packages/DietTrackingCore`.
+
+Core Swift targets:
+
+- `DietTrackingDomain`
+- `DietTrackingStorage`
+- `DietTrackingAnalysis`
+- `DietTrackingLogging`
+
+See `docs/BUILD_AND_TEST.md` for exact local-Mac build, headless-test, and architecture-check commands.
+
