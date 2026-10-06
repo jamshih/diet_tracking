@@ -17,6 +17,7 @@ body:
         - Team D — Storage & Privacy
         - Team E — Integration / Maintainer
         - Team F — Product UI/UX
+        - Team G — Ads & Monetization
     validations:
       required: true
   - type: textarea
