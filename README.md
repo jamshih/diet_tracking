@@ -1,7 +1,9 @@
 # Diet Tracking
 
-A free, open-source personal food journal for discovering which foods or food combinations are **associated** with stomach discomfort.
+A free, open-source **native iOS app built in Swift and SwiftUI** for discovering which foods or food combinations are **associated** with stomach discomfort.
 
+> **Production platform contract:** this project is a native Apple-platform codebase. Production application code is written in **Swift**. The iOS presentation layer is **SwiftUI**. Core domain, analysis, validation, and storage contracts must remain independent of SwiftUI so they can be tested headlessly.
+>
 > **Current contributor notice:** GitHub Actions runtime is exhausted. Required validation is performed on the maintainer's local Mac. Agents must record exact local test commands/results, or mark work `pending local Mac verification`. Use standard `grep` for repository text search rather than `rg`/`ag`/other alternatives.
 
 The app’s core loop is:
@@ -13,6 +15,21 @@ The app’s core loop is:
 5. after enough data, review a ranked shortlist of evidence-backed candidate associations.
 
 The product does **not** diagnose disease or claim a food caused a symptom.
+
+## Technology contract
+
+The production application is:
+
+- **Platform:** native iOS;
+- **Language:** Swift;
+- **UI:** SwiftUI;
+- **Core modularity:** Swift Package Manager / Swift modules where practical;
+- **Testing:** headless Swift tests for domain/analysis/storage behavior, plus app/UI tests later;
+- **Architecture rule:** SwiftUI views must not contain or duplicate analysis/domain rules.
+
+Do not introduce React Native, Flutter, Kotlin Multiplatform, web-app shells, or another cross-platform production framework unless a future architecture RFC explicitly reverses this contract.
+
+The minimum iOS deployment version and concrete persistence framework are implementation decisions and should not be silently coupled to the semantic model.
 
 ## Why symptom windows
 
@@ -40,16 +57,16 @@ These context variables are stored explicitly. They are not automatically interp
 We are building semantic correctness before visual polish.
 
 ```
-contracts
-  -> domain + logging + storage
-  -> symptom-window semantics + analysis + adversarial fixtures
-  -> headless end-to-end acceptance (Gate S3)
-  -> UI/UX
+native Swift project skeleton
+  -> Swift domain + logging + storage modules
+  -> symptom-window semantics + Swift analysis + adversarial fixtures
+  -> headless end-to-end acceptance on local Mac (Gate S3)
+  -> SwiftUI UX
   -> monetization integration
   -> production hardening
 ```
 
-The UI is deliberately not the source of truth. The eventual client must call a headlessly tested core.
+The SwiftUI layer is deliberately not the source of truth. It must call the tested Swift core.
 
 ## Candidate model
 
@@ -70,7 +87,7 @@ Advertising must be isolated from health inference. Diet logs, symptom episodes,
 
 - `AGENTS.md` — rules for agents/contributors and GitHub debate
 - `docs/PRODUCT_SPEC.md` — semantic product contract
-- `docs/ARCHITECTURE.md` — module boundaries and data flow
+- `docs/ARCHITECTURE.md` — Swift module boundaries and data flow
 - `docs/ANALYSIS_MODEL.md` — proposed association-ranking model
 - `docs/VALIDATION_GATES.md` — S0–S3 semantic gates, then UI/monetization gates
 - `docs/WORKSTREAMS.md` — teams, dependencies, and parallel work
@@ -80,7 +97,7 @@ Advertising must be isolated from health inference. Diet logs, symptom episodes,
 
 ## Current milestone
 
-Gate S3: one headless command on the local Mac must prove **log -> persist -> reload -> analyze -> expected report**.
+First bootstrap the native Swift project/module skeleton. Then Gate S3 must eventually prove **log -> persist -> reload -> analyze -> expected report** on the local Mac.
 
 ## Open source
 
