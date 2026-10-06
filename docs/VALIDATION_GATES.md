@@ -6,6 +6,20 @@ The project separates “does it work?” from “does it look good?” and “d
 
 No UI/UX or advertising implementation should become the main workstream until Gate S3 passes.
 
+## Validation authority while GitHub Actions is unavailable
+
+GitHub Actions runtime is currently exhausted.
+
+Until this notice is explicitly removed, a gate passes only from **local-Mac validation evidence**.
+
+Rules:
+
+- CI absence/failure caused by GitHub Actions availability does not count as product failure, but it also does not count as a pass;
+- every claimed gate must record the exact command executed on the maintainer's Mac and the result;
+- an agent without local-Mac access must mark validation `pending local Mac verification` and provide copy-pasteable commands;
+- do not downgrade or skip semantic tests just because CI is unavailable;
+- repository text-search instructions used during validation should use standard `grep`.
+
 ## S0 — Contracts
 
 Pass when:
@@ -45,7 +59,7 @@ Pass when deterministic fixtures prove:
 
 ## S3 — End-to-end headless acceptance
 
-Pass when one command can:
+Pass when one command on the local Mac can:
 
 1. seed a clean store from a fixture;
 2. write meals, symptom episodes, and daily context through production domain APIs;
