@@ -3,6 +3,7 @@ import Foundation
 /// Centralized failures for semantic domain invariants.
 public enum DomainValidationError: Error, Equatable, Sendable {
     case emptyFoodName
+    case emptyMealType
     case invalidScore(field: String, value: Int)
     case invalidSymptomOnsetWindow
     case emptyMeal
