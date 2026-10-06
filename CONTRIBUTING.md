@@ -2,6 +2,22 @@
 
 Thank you for contributing.
 
+## Current validation environment
+
+GitHub Actions runtime is currently exhausted, so **GitHub Actions is not the project's validation authority right now**.
+
+Required tests must pass on the maintainer's local Mac.
+
+If you can run on that Mac, record the exact command and outcome. If you cannot, provide the exact validation command in your handoff and mark the work **pending local Mac verification**. Do not claim a pass based on an unavailable or infrastructure-failed CI run.
+
+For repository text search, use standard `grep`, not `rg`, `ag`, `ack`, or another search utility. This keeps commands reproducible on the maintainer's machine.
+
+Example:
+
+```sh
+grep -R -n --exclude-dir=.git "search term" .
+```
+
 ## Development order
 
 The project intentionally follows this order:
@@ -20,7 +36,8 @@ See `AGENTS.md` for the multi-agent workflow.
 - work from an issue;
 - keep scope narrow;
 - add tests for behavior changes;
-- run the relevant semantic gates;
+- run the relevant semantic gates on the local Mac, or hand off the exact commands for local execution;
+- document the actual validation state;
 - document known limitations;
 - include a concise handoff.
 
