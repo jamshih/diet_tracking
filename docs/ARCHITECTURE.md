@@ -1,14 +1,52 @@
 # Architecture
 
+## Production platform contract
+
+Diet Tracking is a **native iOS application written in Swift with SwiftUI**.
+
+This is not an open platform-selection question.
+
+Production architecture:
+
+```
+SwiftUI iOS application
+        |
+        v
+application/use-case layer
+        |
+        +--------------------+
+        |                    |
+        v                    v
+Swift Domain            Swift Analysis
+        |                    |
+        +---------+----------+
+                  |
+                  v
+          Storage protocols
+                  |
+                  v
+        local persistence adapter
+```
+
+Core rules:
+
+- domain, analysis, validation, and storage protocols are Swift but **must not depend on SwiftUI**;
+- use Swift Package Manager / separate Swift modules where practical so core behavior can run headlessly;
+- SwiftUI owns presentation and user interaction only;
+- no React Native, Flutter, Kotlin Multiplatform, embedded web app, or other production UI framework without a future architecture RFC;
+- do not select a persistence technology in a way that leaks persistence-framework types into Domain/Analysis.
+
 ## Principle
 
 Semantic correctness comes before presentation or monetization.
 
-The first implementation should make the domain engine runnable without any mobile UI or advertising SDK. The eventual app client and ad layer are adapters around a tested core.
+The first implementation should make the Swift domain engine runnable without SwiftUI or an advertising SDK. The iOS app and ad layer are adapters around a tested core.
 
-## Module boundaries
+## Suggested module boundaries
 
-### 1. Domain
+The exact target names may be refined by the bootstrap PR, but preserve these dependency directions.
+
+### 1. DietTrackingDomain
 
 Owns immutable concepts and validation rules:
 
@@ -20,11 +58,11 @@ Owns immutable concepts and validation rules:
 - CandidateSignal
 - AnalysisReport
 
-No persistence, networking, UI, or advertising dependencies.
+Dependencies: Swift standard/Foundation functionality only as necessary. No SwiftUI, persistence framework, networking SDK, or ad SDK.
 
-### 2. Logging
+### 2. DietTrackingLogging / Application
 
-Owns commands for creating, editing, deleting, and querying:
+Owns commands/use cases for creating, editing, deleting, and querying:
 
 - meals;
 - symptom episodes;
@@ -32,33 +70,44 @@ Owns commands for creating, editing, deleting, and querying:
 
 It validates user-entered data and converts it into domain records.
 
-### 3. Storage
+No SwiftUI dependency.
 
-Owns durable persistence behind an interface.
+### 3. DietTrackingStorage
 
-Initial target: local-first storage. Tests must also have an in-memory implementation.
+Owns storage protocols plus adapters.
+
+Initial direction: local-first storage. Tests must have an in-memory implementation.
 
 Cloud sync is a later adapter and must not be required for analysis correctness.
 
-### 4. Analysis
+### 4. DietTrackingAnalysis
 
 Consumes normalized meal exposures, symptom windows, severity, and optional daily context.
 
-The analysis module emits ranked candidate signals and must be deterministic for a fixed dataset and configuration.
+It emits ranked candidate signals and must be deterministic for fixed data/configuration.
 
-Stress and mental well-being are initially stored as contextual variables. Whether they become model covariates requires an explicit RFC and regression validation.
+No SwiftUI dependency.
 
-### 5. Validation
+Stress and mental well-being are initially contextual variables. Whether they become model covariates requires an explicit RFC and regression validation.
 
-Owns fixtures, semantic acceptance tests, property tests, and regression datasets.
+### 5. DietTrackingValidation / tests
 
-This module defines whether the product “works.”
+Owns fixtures, semantic acceptance tests, property/regression datasets, and Gate S3 harnesses.
 
-### 6. Presentation
+This defines whether the product “works.”
 
-Blocked until the semantic gate passes.
+### 6. iOS App / SwiftUI Presentation
 
-The UI may not duplicate domain or analysis rules.
+Owns:
+
+- SwiftUI app lifecycle;
+- screens/navigation;
+- meal/symptom/context entry;
+- thermometer severity graph;
+- accessibility;
+- rendering candidate evidence.
+
+It may not duplicate domain/analysis rules.
 
 ### 7. Advertising / Monetization
 
@@ -71,22 +120,22 @@ Advertising failures must never break logging, persistence, or analysis.
 ## Data flow
 
 ```
-raw meal input
-  -> Logging validation
-  -> normalized MealLog
+SwiftUI input
+  -> Logging/Application
+  -> normalized Domain records
   -> Storage
              \
 symptom window -> validation -> Storage
                               \
 daily context -----------------> Analysis
                                   -> CandidateSignal[]
-                                  -> Presentation
+                                  -> SwiftUI presentation
 ```
 
-Advertising is outside this path:
+Advertising stays outside the health-data path:
 
 ```
-Ad provider -> Advertising adapter -> Presentation slot
+Ad provider -> Advertising adapter -> SwiftUI ad slot
 ```
 
 No health-domain event is routed to the ad provider.
@@ -95,7 +144,7 @@ No health-domain event is routed to the ad provider.
 
 Meals and symptom windows carry timezone context.
 
-V0 analysis should compare food exposure against symptom intervals using explicit lag-window semantics defined by RFC.
+V0 analysis compares food exposure against symptom intervals using explicit lag-window semantics defined by RFC.
 
 A daily fallback remains available for days where the user does not create symptom episodes.
 
