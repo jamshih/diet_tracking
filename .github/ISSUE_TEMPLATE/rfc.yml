@@ -1,0 +1,53 @@
+name: RFC / decision
+description: Debate a semantic or architectural decision until consensus is recorded
+title: "[RFC] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not implement a contract-changing decision until this RFC reaches consensus.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Viable options
+      description: Include at least two when alternatives exist.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests / counterexamples that distinguish options
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed decision
+    validations:
+      required: true
+  - type: textarea
+    id: dissent
+    attributes:
+      label: Dissent / unresolved risks
+      description: Reviewers should add challenges in comments.
+  - type: checkboxes
+    id: consensus
+    attributes:
+      label: Consensus record
+      options:
+        - label: Alternatives were discussed.
+        - label: At least one reviewer attempted to falsify the proposal.
+        - label: Remaining risks are documented.
+        - label: Final decision and acceptance tests are recorded.
