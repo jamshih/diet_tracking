@@ -4,7 +4,7 @@ Issue/RFC:
 
 ## Responsibility
 
-Team: A / B / C / D / E / F
+Team: A / B / C / D / E / F / G
 
 ## Semantic change
 
