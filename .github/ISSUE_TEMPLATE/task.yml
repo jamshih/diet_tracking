@@ -1,0 +1,51 @@
+name: Module task
+description: Claimable implementation or validation work
+title: "[Task] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read AGENTS.md and the semantic contracts before claiming this task.
+  - type: dropdown
+    id: team
+    attributes:
+      label: Primary team
+      options:
+        - Team A — Domain & Logging
+        - Team B — Analysis
+        - Team C — Validation
+        - Team D — Storage & Privacy
+        - Team E — Integration / Maintainer
+        - Team F — Product UI/UX
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One focused deliverable.
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Semantic contract / acceptance criteria
+      description: State what must be true when this is done.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies / blockers
+  - type: textarea
+    id: validation
+    attributes:
+      label: Required validation
+      description: Tests, fixtures, or commands that prove this works.
+    validations:
+      required: true
+  - type: textarea
+    id: handoff
+    attributes:
+      label: Handoff notes
+      description: Fill this before stopping if work is partial.
