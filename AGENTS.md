@@ -4,9 +4,9 @@ This repository is designed for multiple coding/review agents working asynchrono
 
 ## Prime directive
 
-Do not optimize presentation before semantic correctness.
+Do not optimize presentation or monetization before semantic correctness.
 
-Until Validation Gate S3 passes, prioritize domain behavior, persistence, analysis correctness, fixtures, and integration over UI polish.
+Until Validation Gate S3 passes, prioritize domain behavior, persistence, symptom-window semantics, analysis correctness, fixtures, and integration over UI polish or ad revenue.
 
 ## Start-of-task protocol
 
@@ -15,64 +15,61 @@ Every agent must:
 1. read `README.md`, `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, and `docs/VALIDATION_GATES.md`;
 2. inspect open GitHub issues before inventing new work;
 3. choose one unblocked issue or clearly scoped subtask;
-4. comment on the issue with:
-   - what you are taking;
-   - expected files/modules touched;
-   - assumptions or questions;
+4. comment on the issue with what you are taking, files/modules, assumptions/questions;
 5. avoid overlapping another active agent unless intentionally reviewing/challenging that work.
 
 ## Team model
 
-Agents work by responsibility, not by permanent identity.
-
 - **Team A — Domain & Logging**
-  Owns domain types, normalization, meal/check-in commands, time semantics.
+  Owns food, meal, symptom-episode, daily-context types, normalization, commands, and time semantics.
 - **Team B — Analysis**
-  Owns candidate generation, scoring, uncertainty/evidence metadata, ranking.
+  Owns temporal exposure, candidate generation, scoring, uncertainty/evidence metadata, ranking.
 - **Team C — Validation**
   Owns fixtures, acceptance tests, adversarial datasets, semantic regression gates.
 - **Team D — Storage & Privacy**
-  Owns persistence interfaces, local store, import/export, privacy boundaries.
+  Owns persistence interfaces, local store, import/export, sensitive-data boundaries.
 - **Team E — Integration / Maintainer**
   Owns contracts between modules, architecture decisions, merge readiness, release gates.
 - **Team F — Product UI/UX**
   Begins substantive implementation only after S3. Owns presentation, accessibility, interaction design, and user testing.
+- **Team G — Ads & Monetization**
+  Owns ad-provider adapters, ad placement contracts, consent/configuration, revenue instrumentation that does not expose health-context data, and monetization failure isolation.
 
 An agent may temporarily serve multiple teams, but each PR must name the responsibility being exercised.
 
+## Ads-team hard boundary
+
+Team G must not receive or transmit raw:
+
+- food logs;
+- symptom windows or severity;
+- stress scores;
+- mental-wellbeing scores;
+- candidate-analysis results
+
+for ad targeting or ad analytics.
+
+Any proposal to relax this boundary requires a dedicated privacy RFC and maintainer approval. The default assumption is contextual/non-personalized advertising.
+
 ## Debate protocol
 
-Important design choices must be debated on GitHub, not buried in private notes.
+Important design choices must be debated on GitHub.
 
 Use an RFC/decision issue when a choice changes:
 
 - public domain schemas;
-- analysis formula or evidence thresholds;
-- time semantics;
+- symptom-time semantics;
+- analysis formula/evidence thresholds;
+- use of stress/well-being in analysis;
 - normalization semantics;
 - persistence format;
-- privacy/network behavior;
+- privacy/network/ad behavior;
 - module boundaries;
 - UI representation of evidence.
 
-An RFC must contain at least:
+Reviewing agents must challenge assumptions, especially false correlations, data sparsity, fake timing precision, and privacy leakage.
 
-1. problem;
-2. constraints;
-3. at least two viable options when alternatives exist;
-4. arguments for/against;
-5. concrete tests that distinguish the options;
-6. proposed decision;
-7. dissent or unresolved risks.
-
-Reviewing agents must challenge assumptions, especially around false correlations and data sparsity.
-
-Consensus means either:
-
-- reviewers explicitly agree; or
-- disagreements are documented and the maintainer records why one option was chosen.
-
-Silence alone is not consensus.
+Consensus means explicit agreement or documented disagreement plus a maintainer decision. Silence alone is not consensus.
 
 ## PR contract
 
@@ -90,7 +87,7 @@ Do not merge a behavior change that lacks regression coverage.
 
 ## Handoff rule
 
-Before stopping work, update the issue or PR with a concise handoff containing:
+Before stopping work, update the issue or PR with:
 
 - **State:** done / partial / blocked;
 - **Changed:** files/modules and behavior;
@@ -101,18 +98,6 @@ Before stopping work, update the issue or PR with a concise handoff containing:
 
 A new agent should be able to continue without reading chat history.
 
-## Scope discipline
-
-Prefer small vertical slices.
-
-Good:
-- domain types + tests;
-- one storage adapter + round-trip tests;
-- one scoring implementation + fixtures.
-
-Bad:
-- domain + database + UI + redesign + analytics in one PR.
-
 ## Health-product constraint
 
-This project surfaces personal associations. Do not introduce diagnostic claims or medical-treatment recommendations. Candidate output must preserve uncertainty and supporting evidence.
+This project surfaces personal associations. Do not introduce diagnostic claims, mental-health diagnosis, or medical-treatment recommendations. Candidate output must preserve uncertainty and supporting evidence.
