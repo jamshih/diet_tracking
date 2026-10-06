@@ -249,18 +249,22 @@
 /* Begin XCSwiftPackageProductDependency section */
 		A10000000000000000000081 /* DietTrackingDomain */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000080 /* XCLocalSwiftPackageReference "Packages/DietTrackingCore" */;
 			productName = DietTrackingDomain;
 		};
 		A10000000000000000000082 /* DietTrackingStorage */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000080 /* XCLocalSwiftPackageReference "Packages/DietTrackingCore" */;
 			productName = DietTrackingStorage;
 		};
 		A10000000000000000000083 /* DietTrackingAnalysis */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000080 /* XCLocalSwiftPackageReference "Packages/DietTrackingCore" */;
 			productName = DietTrackingAnalysis;
 		};
 		A10000000000000000000084 /* DietTrackingLogging */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000080 /* XCLocalSwiftPackageReference "Packages/DietTrackingCore" */;
 			productName = DietTrackingLogging;
 		};
 /* End XCSwiftPackageProductDependency section */
