@@ -6,43 +6,95 @@ Produce a ranked shortlist of food-related candidates associated with higher sel
 
 This is association discovery, not causal inference.
 
-## Observation unit
+## Observation model
 
-The initial model uses one row per local calendar day:
+The analysis has two evidence sources.
 
-- outcome `y_d`: daily discomfort score, 0–10;
-- food exposure `x[d, i]`: whether normalized food item `i` appeared that day;
-- pair exposure `x[d, i, j]`: whether both items appeared that day;
-- attributes: e.g. any spicy meal that day.
+### Primary: symptom episodes
+
+Each episode has:
+
+- an uncertain onset interval;
+- severity, 0–10;
+- timezone context.
+
+Food exposures are evaluated relative to the episode using an explicit candidate lag window.
+
+The exact lag weighting is not fixed in this document; it must be settled in an RFC.
+
+### Fallback: daily summary
+
+For days without useful symptom episodes, the model may use:
+
+- daily overall discomfort, 0–10;
+- food exposure by local calendar day.
+
+This fallback must be distinguishable from episode-level evidence in the output.
+
+## Context variables
+
+Daily context may contain:
+
+- stress, 0–10, higher = more stressed;
+- overall mental well-being, 0–10, higher = better.
+
+V0 stores these values but does not silently regress them out or use them to explain symptoms.
+
+A later analysis RFC may test whether using these variables as covariates improves calibration without creating misleading conclusions.
+
+## Exposure candidates
+
+The engine evaluates:
+
+- individual food items;
+- unordered food pairs.
+
+A pair is eligible only when both members fall inside the same defined pre-symptom exposure horizon for sufficient episodes.
+
+High-order combinations remain out of scope.
 
 ## V0 transparent scoring
 
-For a candidate `c`:
+For each candidate, the scoring system should combine:
 
-- collect days where `c` is present;
-- collect comparable observed days where `c` is absent;
-- compute the difference between mean discomfort when present and absent;
-- shrink/rate the result down when support is low;
-- report support counts and uncertainty metadata;
-- rank only positive associations.
+- repeated exposure before higher-severity episodes;
+- comparison observations where the candidate was absent;
+- support count;
+- effect size;
+- reliability/shrinkage;
+- episode-window uncertainty.
 
 The implementation must keep the exact scoring formula centralized and versioned.
 
-A simple transparent score is preferred before introducing a more complex model. A later RFC may replace V0 with ridge/elastic-net, Bayesian shrinkage, or another repeated-measures model, but only if it beats the semantic fixtures and calibration tests.
+A simple, explainable model is preferred until a more complex model demonstrably performs better on adversarial fixtures.
+
+## Window uncertainty
+
+A wide symptom onset window should contribute less precise temporal evidence than a narrow window.
+
+The model must not collapse a 2-hour uncertainty window to its midpoint and behave as if the user supplied an exact time.
+
+Possible approaches to debate:
+
+- uniform probability across the interval;
+- overlap-weighted exposure score;
+- conservative earliest/latest bounds;
+- sampling/integration across the interval.
+
+This is an RFC decision.
 
 ## Minimum evidence rules
 
-Exact constants are configuration, not magic numbers scattered through code.
+Exact constants are configuration.
 
-Initial policy proposal:
+Initial principles:
 
-- individual candidate: at least 3 exposed days and 3 non-exposed observed days;
-- pair candidate: at least 3 co-exposed days and 5 non-exposed observed days;
-- do not rank a candidate if all outcomes are identical;
-- pair candidates should be penalized more strongly than individual candidates;
-- cap the visible shortlist rather than returning every positive correlation.
-
-These thresholds are deliberately conservative for an MVP and must be debated in the analysis RFC before being frozen.
+- individual candidates require repeated observations;
+- pair candidates require stronger support than individuals;
+- one-off exposures do not rank;
+- wider symptom-time uncertainty should reduce confidence;
+- daily-fallback evidence should be labeled separately;
+- cap the visible shortlist rather than returning every positive association.
 
 ## Candidate output
 
@@ -51,47 +103,38 @@ Each `CandidateSignal` should include at least:
 - stable candidate id;
 - kind: `item` or `pair`;
 - member food ids;
-- exposed-day count;
-- comparison-day count;
-- mean discomfort when present;
-- mean discomfort when absent;
-- raw difference;
-- confidence/reliability value;
+- episode support count;
+- comparison count;
+- daily-fallback support count if used;
+- severity/effect summary;
+- temporal confidence;
+- reliability/confidence value;
 - final ranking score;
 - evidence tier;
 - analysis-version identifier.
-
-## Evidence tiers
-
-Suggested language:
-
-- insufficient: not ranked;
-- limited: meets minimum support, large uncertainty;
-- moderate: repeated signal;
-- stronger: repeated signal with materially better support.
-
-Tier thresholds must be deterministic and tested.
 
 ## Guardrails
 
 The engine must not:
 
 - claim causality;
-- infer a disease;
-- recommend eliminating broad food groups as medical treatment;
-- hide uncertainty;
+- infer gastrointestinal or mental-health disease;
+- recommend eliminating broad food groups as treatment;
+- treat stress or mental well-being as proven causes;
+- hide timing uncertainty;
 - rank one-off foods;
-- generate high-order combinations from sparse data.
+- generate high-order sparse combinations.
 
 ## Future analysis questions
 
-Track as RFCs, not ad-hoc changes:
+Track as RFCs:
 
-- delayed/next-day symptom effects;
-- meal-level symptom check-ins;
+- exact lag horizon and decay function;
+- symptom duration versus onset uncertainty;
+- stress/well-being as model covariates;
 - portion size;
-- spicy intensity instead of binary;
-- medication, sleep, stress, menstrual cycle, alcohol, or illness confounders;
-- user-confirmed aliases and food categories;
+- spicy intensity;
+- medication, sleep, menstrual cycle, alcohol, illness, exercise;
+- user-confirmed aliases/categories;
 - robust regression / Bayesian model;
 - personalized experiment suggestions.
