@@ -1,10 +1,10 @@
 # Validation Gates
 
-## Why this file exists
+## Platform baseline
 
-The project separates “does it work?” from “does it look good?” and “does it monetize?”
+This is a native iOS **Swift + SwiftUI** project.
 
-No UI/UX or advertising implementation should become the main workstream until Gate S3 passes.
+Core semantic gates must be runnable from the local Mac without interacting with the SwiftUI UI. SwiftUI tests complement semantic tests; they do not replace them.
 
 ## Validation authority while GitHub Actions is unavailable
 
@@ -20,11 +20,22 @@ Rules:
 - do not downgrade or skip semantic tests just because CI is unavailable;
 - repository text-search instructions used during validation should use standard `grep`.
 
+## P0 — Swift project bootstrap
+
+Pass when local-Mac validation proves:
+
+- the native iOS project opens/builds;
+- the SwiftUI app target compiles;
+- core Swift module/package tests run headlessly;
+- SwiftUI is not imported by Domain/Analysis targets;
+- a trivial core test passes;
+- exact commands are documented.
+
 ## S0 — Contracts
 
 Pass when:
 
-- domain types are defined;
+- domain types are defined in UI-independent Swift;
 - invalid scores and malformed meals/episodes are rejected;
 - symptom-window uncertainty is represented explicitly;
 - same input normalizes identically every time;
@@ -32,7 +43,7 @@ Pass when:
 
 ## S1 — Logging + persistence
 
-Pass when automated tests prove:
+Pass when automated Swift tests prove:
 
 - create/edit/delete meal;
 - create/edit/delete symptom episode;
@@ -44,7 +55,7 @@ Pass when automated tests prove:
 
 ## S2 — Analysis semantics
 
-Pass when deterministic fixtures prove:
+Pass when deterministic Swift fixtures prove:
 
 - a clearly associated synthetic item ranks near the top;
 - a neutral item does not rank as harmful;
@@ -62,27 +73,27 @@ Pass when deterministic fixtures prove:
 Pass when one command on the local Mac can:
 
 1. seed a clean store from a fixture;
-2. write meals, symptom episodes, and daily context through production domain APIs;
+2. write meals, symptom episodes, and daily context through production Swift APIs;
 3. reload the store;
 4. run analysis;
 5. compare the resulting report with an expected semantic snapshot.
 
 At S3, the semantic product is considered functionally real.
 
-## U0 — UI foundation
+## U0 — SwiftUI foundation
 
 Only after S3:
 
-- choose client platform/framework;
 - map screens to tested use cases;
 - build meal logging;
 - build approximate symptom-window + severity logging;
 - build daily stress/well-being context meters;
+- build thermometer severity visualization;
 - render candidate evidence faithfully.
 
 ## U1 — UX acceptance
 
-Pass when representative users can complete the core loop without developer guidance and without the UI changing analysis semantics.
+Pass when representative users can complete the core loop without developer guidance and without SwiftUI changing analysis semantics.
 
 ## M0 — Monetization isolation
 

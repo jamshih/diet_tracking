@@ -1,23 +1,26 @@
 # Workstreams and Dependency Map
 
-## Phase 0 — Repository contract
+## Phase 0 — Native Swift bootstrap
 
-Deliverables:
-- product contract;
-- architecture;
-- symptom-window semantics;
-- analysis proposal;
-- validation gates;
-- agent workflow;
-- privacy-safe monetization contract;
-- initial RFC/task issues.
+### P0. Swift/iOS project skeleton
+Owner: Team E with Team A review
+
+Deliver:
+- native iOS project;
+- SwiftUI app target that builds;
+- SwiftPM/separate Swift modules for core logic;
+- test targets runnable without launching the UI;
+- minimal placeholder app shell only;
+- no product UI design work yet.
+
+This is the first implementation task and precedes A1.
 
 ## Phase 1 — Semantic core
 
 ### A1. Domain model
 Owner: Team A
 
-Deliver:
+Deliver in UI-independent Swift:
 - FoodItem / FoodExposure;
 - MealLog;
 - SymptomEpisode;
@@ -25,10 +28,12 @@ Deliver:
 - CandidateSignal / AnalysisReport;
 - validation and normalization rules.
 
+Depends on: P0.
+
 ### A2. Logging service
 Owner: Team A
 
-Deliver:
+Deliver in UI-independent Swift:
 - create/edit/delete meal;
 - create/edit/delete symptom episode;
 - create/update daily context;
@@ -40,7 +45,7 @@ Depends on: A1.
 Owner: Team D
 
 Deliver:
-- repository interfaces;
+- Swift storage protocols;
 - deterministic in-memory adapter;
 - serialization contract.
 
@@ -54,17 +59,17 @@ Deliver:
 - migration/version strategy;
 - import/export round-trip.
 
-Depends on: D1.
+Depends on: D1 and persistence RFC.
 
 ## Phase 2 — Temporal analysis + adversarial validation
 
 ### B1. Temporal exposure projection
 Owner: Team B
 
-Deliver:
-- define exposures relative to uncertain symptom-onset windows;
-- preserve uncertainty;
-- support daily fallback observations.
+Deliver in Swift:
+- exposures relative to uncertain symptom-onset windows;
+- preserved uncertainty;
+- daily fallback observations.
 
 Depends on: A1 + symptom-window RFC.
 
@@ -94,7 +99,7 @@ Depends on: B2 + scoring RFC.
 ### C1. Synthetic truth fixtures
 Owner: Team C
 
-Create datasets for:
+Create Swift test fixtures for:
 - strong individual signal;
 - neutral food;
 - rare misleading food;
@@ -118,25 +123,27 @@ Depends on: B3 + C1.
 ### E1. End-to-end semantic harness
 Owner: Team E
 
-One command must:
+One local-Mac command must:
 seed -> log meals/symptoms/context -> persist -> reload -> analyze -> snapshot-check.
 
 Depends on: A2, D2, B3, C2.
 
 This is Gate S3.
 
-## Phase 4 — UI/UX
+## Phase 4 — SwiftUI UI/UX
 
 ### F1. UX architecture
 Owner: Team F
 
-Define:
+Implement in SwiftUI only after S3:
+
 - meal logging;
 - spicy control;
 - symptom onset-window picker;
 - severity meter;
 - daily stress meter;
 - daily mental-wellbeing meter;
+- thermometer-style severity graph;
 - candidate/evidence presentation;
 - accessibility behavior.
 
@@ -151,7 +158,7 @@ Only after interaction flow is validated.
 Owner: Team G
 
 Deliver:
-- ad-provider abstraction;
+- provider abstraction;
 - contextual/non-personalized default;
 - consent/configuration;
 - zero health-data targeting contract;
@@ -162,11 +169,7 @@ Depends on: S3.
 ### G2. Ad placement
 Owner: Team G + Team F
 
-Deliver:
-- placements that do not interrupt meal/symptom logging;
-- loading/failure states;
-- accessibility;
-- no dark patterns.
+Implement provider UI/ad slots in the native iOS app without contaminating core modules.
 
 Depends on: G1 + core UX.
 
@@ -190,11 +193,12 @@ Verify:
 
 ## Parallelism
 
-Safe early parallel work:
+First complete P0.
 
-- A1 and C1 can proceed together.
-- D1 can begin once A1 types stabilize.
-- symptom-window and scoring RFC debate can run while A1 is implemented.
+After P0:
+- A1 and C1 can proceed together;
+- D1 can begin as A1 contracts stabilize;
+- symptom-window/scoring RFC debate can run in parallel.
 
-Do not begin B3 before the scoring RFC is resolved.
-Do not make F1/F2 or Team G the dominant work before S3.
+Do not begin B3 before scoring consensus.
+Do not make SwiftUI polish or Team G the dominant work before S3.
