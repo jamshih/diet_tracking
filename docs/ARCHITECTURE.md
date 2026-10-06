@@ -2,9 +2,9 @@
 
 ## Principle
 
-Semantic correctness comes before presentation.
+Semantic correctness comes before presentation or monetization.
 
-The first implementation should make the domain engine runnable without any mobile UI. The eventual app client is an adapter around a tested core, not the place where business logic lives.
+The first implementation should make the domain engine runnable without any mobile UI or advertising SDK. The eventual app client and ad layer are adapters around a tested core.
 
 ## Module boundaries
 
@@ -15,15 +15,20 @@ Owns immutable concepts and validation rules:
 - FoodItem
 - FoodExposure
 - MealLog
-- DailyCheckIn
+- SymptomEpisode
+- DailyContextCheckIn
 - CandidateSignal
 - AnalysisReport
 
-No persistence, networking, or UI dependencies.
+No persistence, networking, UI, or advertising dependencies.
 
 ### 2. Logging
 
-Owns commands for creating, editing, deleting, and querying meal/check-in records.
+Owns commands for creating, editing, deleting, and querying:
+
+- meals;
+- symptom episodes;
+- daily context check-ins.
 
 It validates user-entered data and converts it into domain records.
 
@@ -37,9 +42,11 @@ Cloud sync is a later adapter and must not be required for analysis correctness.
 
 ### 4. Analysis
 
-Consumes normalized daily exposures plus daily discomfort scores and emits ranked candidate signals.
+Consumes normalized meal exposures, symptom windows, severity, and optional daily context.
 
-The analysis module must be deterministic for a fixed dataset and configuration.
+The analysis module emits ranked candidate signals and must be deterministic for a fixed dataset and configuration.
+
+Stress and mental well-being are initially stored as contextual variables. Whether they become model covariates requires an explicit RFC and regression validation.
 
 ### 5. Validation
 
@@ -51,7 +58,15 @@ This module defines whether the product “works.”
 
 Blocked until the semantic gate passes.
 
-The UI can later choose platform-specific technologies, but it may not duplicate domain or analysis rules.
+The UI may not duplicate domain or analysis rules.
+
+### 7. Advertising / Monetization
+
+Owns ad-provider integration, ad placement contracts, consent/configuration, failure behavior, and monetization tests.
+
+It must not own or read raw diet/symptom/stress/mental-wellbeing data.
+
+Advertising failures must never break logging, persistence, or analysis.
 
 ## Data flow
 
@@ -60,28 +75,50 @@ raw meal input
   -> Logging validation
   -> normalized MealLog
   -> Storage
-  -> daily exposure projection
-  -> Analysis
-  -> CandidateSignal[]
-  -> Presentation
+             \
+symptom window -> validation -> Storage
+                              \
+daily context -----------------> Analysis
+                                  -> CandidateSignal[]
+                                  -> Presentation
 ```
 
-Daily check-in:
+Advertising is outside this path:
 
 ```
-0..10 score
-  -> validation
-  -> Storage
-  -> Analysis joins by local calendar day
+Ad provider -> Advertising adapter -> Presentation slot
 ```
+
+No health-domain event is routed to the ad provider.
 
 ## Time semantics
 
-The daily outcome is tied to the user’s local calendar day.
+Meals and symptom windows carry timezone context.
 
-A meal belongs to a day according to the timezone captured for that event. Tests must cover meals near midnight and timezone changes.
+V0 analysis should compare food exposure against symptom intervals using explicit lag-window semantics defined by RFC.
 
-The first analysis version uses same-day exposure because the symptom label is daily. Lagged effects can be added later only through an explicit decision record.
+A daily fallback remains available for days where the user does not create symptom episodes.
+
+Tests must cover:
+
+- meals near midnight;
+- symptom windows crossing midnight;
+- timezone changes;
+- wide/uncertain windows;
+- missing daily context.
+
+## Symptom-window representation
+
+Do not fabricate precision.
+
+If a user says discomfort began “between 1:30 and 3,” store the interval itself.
+
+The schema should distinguish:
+
+- onset uncertainty interval;
+- optional duration/end information if later collected.
+
+If V0 only collects onset uncertainty, name fields accordingly rather than implying a duration.
 
 ## Food normalization
 
@@ -92,13 +129,15 @@ Start with transparent normalization:
 - trim whitespace;
 - case-fold;
 - normalize repeated spaces;
-- preserve the original display label;
+- preserve original display label;
 - allow explicit aliases later.
-
-“fried chicken” and “chicken” remain different unless a rule or user action merges them.
 
 ## Privacy default
 
-Food and symptom logs are sensitive personal data. The default architecture is local-first, with no analytics or remote processing required to obtain candidate results.
+Food, symptom, stress, and mental-wellbeing logs are sensitive personal data.
 
-Any future sync or telemetry work must be isolated behind interfaces and reviewed separately.
+The default architecture is local-first, with no remote processing required to obtain candidate results.
+
+The advertising module has a separate privacy boundary and must not receive these health-context fields for targeting or analytics.
+
+Any future sync, telemetry, or ad personalization proposal requires explicit review.
