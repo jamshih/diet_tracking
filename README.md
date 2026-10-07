@@ -99,9 +99,11 @@ Advertising must be isolated from health inference. Diet logs, symptom episodes,
 
 First bootstrap the native Swift project/module skeleton. Then Gate S3 must eventually prove **log -> persist -> reload -> analyze -> expected report** on the local Mac.
 
-## Open source
+## License
 
-This project is intended to remain free and open source. The exact license will be selected through an explicit RFC rather than silently assumed.
+Diet Tracking is licensed under the [Apache License 2.0](LICENSE).
+
+The project remains permissively licensed for open-source and commercial reuse subject to the license terms. Release/App Store distribution must also preserve required license and attribution material; see Issue #29 for the follow-up release-compliance work.
 
 ## Native iOS bootstrap
 

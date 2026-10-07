@@ -54,6 +54,10 @@ Suggested prefixes:
 - `refactor:`
 - `chore:`
 
+## Contribution license
+
+Unless explicitly stated otherwise, contributions intentionally submitted for inclusion in Diet Tracking are accepted under the project's Apache License 2.0, consistent with Section 5 of the license.
+
 ## Open-source conduct
 
 Be critical of ideas, not contributors. Record technical disagreement in the relevant GitHub issue so later contributors can understand the tradeoff.
